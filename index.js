@@ -5,13 +5,15 @@ const connectionDB = require('./src/Database/DBConnection');
 
 //Import routers
 const IndexRouter = require('./src/Routes/IndexRouter');
+const UserRouter = require('./src/Routes/UserRouter');
 
 //Database Connect
-connectionDB.authenticate().then(() => {
+try {
+    connectionDB.authenticate()
     console.log(`Success connecting to database postgres`)
-}).catch(err => {
-    console.log(`Error connect to database. Error message: ${err}`)
-})
+} catch (error) {
+    console.log(`Error connect to database. Error message: ${error}`)
+}
 
 //Sessions
 
@@ -27,7 +29,7 @@ app.use(express.static('public'));
 
 //Routes
 app.use('/', IndexRouter);
-
+app.use('/user', UserRouter);
 
 //Connect server
 app.listen(port, () => {
