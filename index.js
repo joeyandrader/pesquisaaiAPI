@@ -6,6 +6,7 @@ const connectionDB = require('./src/Database/DBConnection');
 //Import routers
 const IndexRouter = require('./src/Routes/IndexRouter');
 const UserRouter = require('./src/Routes/UserRouter');
+const CompanyRouter = require('./src/Routes/CompanyRouter');
 
 //Database Connect
 try {
@@ -30,7 +31,7 @@ app.use(express.static('public'));
 //Routes
 app.use('/', IndexRouter);
 app.use('/user', UserRouter);
-
+app.use('/company', CompanyRouter);
 //Connect server
 app.listen(port, () => {
     console.log(`Server is running at the url http://localhost:${port}`);
