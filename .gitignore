@@ -1,2 +1,7 @@
 /node_modules
-/public/images/user/
+
+
+*.png
+*.jpg
+*.jpeg
+*.webp
