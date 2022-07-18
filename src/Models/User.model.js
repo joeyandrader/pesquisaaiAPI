@@ -22,6 +22,9 @@ const User = connectdb.define('person', {
         type: Sequelize.STRING,
         allowNull: false
     },
+    image: {
+        type: Sequelize.STRING
+    },
     termscondition: {
         type: Sequelize.BOOLEAN,
         defaultValue: true
@@ -36,6 +39,7 @@ const User = connectdb.define('person', {
     }
 );
 
+//Relations
 
 // User.sync({ force: true });
 

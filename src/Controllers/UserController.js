@@ -5,6 +5,7 @@ const User = require('../Models/User.model');
 const { findUserByCpf, findUserByEmail, findUserById } = require('../Helpers/FindDB');
 const createUserToken = require('../Helpers/CreateUserToken');
 const getToken = require('../Helpers/getToken');
+const getUserByToken = require('../Helpers/getUserByToken');
 
 //other modules
 const bcrypt = require('bcrypt');
@@ -156,5 +157,71 @@ module.exports = class UserController {
         }
 
         res.status(200).send(currentUser);
+    }
+
+    static async editUser(req, res) {
+        const token = getToken(req);
+        const user = await getUserByToken(token);
+
+        if (!user) {
+            res.status(400).json({ message: "Erro interno!" });
+            console.log(`Error, user is ${user}`)
+            return
+        }
+
+        const { firstname, lastname, email, password, confirmPassword } = req.body
+
+        if (!firstname) {
+            res.status(422).json({ message: "O primeiro nome é obrigatorio!" });
+            return
+        }
+
+        if (!lastname) {
+            res.status(422).json({ message: "O segundo nome é obrigatorio!" });
+            return
+        }
+
+        if (!email) {
+            res.status(422).json({ message: "O Email é obrigatorio!" });
+            return
+        }
+
+        if (req.file) {
+            var image = req.file.filename
+        }
+
+        //Check if email has alraedy taken
+        const checkEmail = await findUserByEmail(email);
+        if (user.email !== email && checkEmail) {
+            res.status(422).json({ message: "Utilize outro email!" });
+            return
+        }
+
+        if (password != confirmPassword) {
+            res.status(422).json({ message: "As senhas não conferem!" });
+            return
+        } else if (password === confirmPassword && password != null) {
+            //Create new password
+            //Create Hash password
+            var salt = await bcrypt.genSalt(12);
+            var hashPassword = await bcrypt.hash(password, salt);
+        }
+
+        try {
+            await User.update(
+                {
+                    firstname,
+                    lastname,
+                    email,
+                    password: hashPassword,
+                    image
+                },
+                { where: { id: user.id } }
+            );
+            res.status(200).json({ message: "Perfil atualizado com sucesso!" });
+        } catch (error) {
+            res.status(500).json({ message: error })
+            console.log(error)
+        }
     }
 }
