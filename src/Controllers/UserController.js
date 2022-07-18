@@ -3,9 +3,12 @@ const User = require('../Models/User.model');
 
 //Helpers
 const { findUserByCpf, findUserByEmail, findUserById } = require('../Helpers/FindDB');
+const createUserToken = require('../Helpers/CreateUserToken');
+const getToken = require('../Helpers/getToken');
 
-//bcrypt
+//other modules
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 module.exports = class UserController {
     static async register(req, res) {
@@ -69,7 +72,7 @@ module.exports = class UserController {
 
         //Create new user in database
         try {
-            await User.create({
+            const user = await User.create({
                 firstname,
                 lastname,
                 email,
@@ -77,8 +80,7 @@ module.exports = class UserController {
                 cpf,
                 termscondition
             })
-
-            res.status(201).json({ message: "Conta cadastrada com sucesso!" })
+            await createUserToken(user, req, res);
         } catch (error) {
             res.status(400).json({ message: "Erro processar sua solicitação!" })
         }
@@ -106,5 +108,53 @@ module.exports = class UserController {
                 error
             })
         }
+    }
+
+    static async login(req, res) {
+        const { email, password } = req.body
+
+        if (!email) {
+            res.status(422).json({ message: 'O email precisa ser preenchido!' })
+            return
+        }
+        if (!password) {
+            res.status(422).json({ message: 'A senha precisa ser preenchido!' })
+            return
+        }
+
+        //Verify if exist a user with this email
+        const user = await findUserByEmail(email);
+        if (!user) {
+            res.status(422).json({ message: 'Conta invalida!' })
+            return
+        }
+
+        //Check if password match with db password
+        const checkPassword = await bcrypt.compare(password, user.password);
+
+        if (!checkPassword) {
+            res.status(422).json({ message: 'Senha invalida!' })
+            return
+        }
+
+        await createUserToken(user, req, res);
+    }
+
+    static async checkUser(req, res) {
+
+        let currentUser
+        console.log(req.headers.authorization)
+
+        if (req.headers.authorization) {
+            const token = getToken(req)
+            const decoded = jwt.verify(token, 'abd4b9ba6539ea7d95d92b61126f4f9cda3499432642800a1cf7729a');
+
+            currentUser = await findUserById(decoded.id);
+            currentUser.password = undefined // Remove password the user
+        } else {
+            currentUser = null
+        }
+
+        res.status(200).send(currentUser);
     }
 }
