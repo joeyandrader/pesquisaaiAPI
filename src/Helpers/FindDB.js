@@ -24,10 +24,16 @@ function findAllCompanyByUserId(search) {
     return Company.findAll({ where: { id_person: search } })
 }
 
+function findCompanyById(id) {
+    return Company.findByPk(id)
+}
+
+
 module.exports = {
     findUserByCpf,
     findUserByEmail,
     findUserById,
     findCompanyByCnpj,
-    findAllCompanyByUserId
+    findAllCompanyByUserId,
+    findCompanyById
 }

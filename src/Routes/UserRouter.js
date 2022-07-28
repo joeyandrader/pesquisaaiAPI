@@ -1,4 +1,4 @@
-const UserController = require("../Controllers/UserController");
+const UserController = require("../Controllers/UserController/UserController");
 const router = require('express').Router()
 
 //Middlewares
@@ -8,8 +8,9 @@ const { imageUpload } = require('../Helpers/imageUpload');
 
 //Routes User
 //Get Routes
-router.get('/profile/:id', UserController.getUserById);
+router.get('/profile/', UserController.getUserById);
 router.get('/checkuser', UserController.checkUser);
+
 
 //Post Routes
 router.post('/login', UserController.login);

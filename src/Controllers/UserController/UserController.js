@@ -1,12 +1,12 @@
 //Get module models
-const User = require('../Models/User.model');
+const User = require('../../Models/User.model');
 
 //Helpers
-const { findUserByCpf, findUserByEmail, findUserById } = require('../Helpers/FindDB');
-const createUserToken = require('../Helpers/CreateUserToken');
-const getToken = require('../Helpers/getToken');
-const getUserByToken = require('../Helpers/getUserByToken');
-
+const { findUserByCpf, findUserByEmail, findUserById } = require('../../Helpers/FindDB');
+const createUserToken = require('../../Helpers/CreateUserToken');
+const getToken = require('../../Helpers/getToken');
+const getUserByToken = require('../../Helpers/getUserByToken');
+const verifyTokenIsValid = require('../../Helpers/VerifyTokenIsValid');
 //other modules
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -88,27 +88,8 @@ module.exports = class UserController {
     }
 
     static async getUserById(req, res) {
-        const id = req.params.id
-        if (isNaN(id)) {
-            res.status(400).json({ message: 'Invalid request id' });
-            return
-        }
-        const user = await findUserById(id);
-        if (user) {
-            user.password = undefined
-        } else {
-            res.status(404).json({ message: 'Usuario não encontrado!' })
-            return
-        }
-
-        try {
-            res.status(200).json({ User: user })
-        } catch (error) {
-            res.status(500).json({
-                message: 'Erro na requisição do ID',
-                error
-            })
-        }
+        res.status(200).json({ message: 'Coming soon' })
+        return
     }
 
     static async login(req, res) {
@@ -144,13 +125,25 @@ module.exports = class UserController {
     static async checkUser(req, res) {
 
         let currentUser
-        console.log(req.headers.authorization)
 
         if (req.headers.authorization) {
             const token = getToken(req)
-            const decoded = jwt.verify(token, 'abd4b9ba6539ea7d95d92b61126f4f9cda3499432642800a1cf7729a');
-
+            const decoded = jwt.verify(token, 'abd4b9ba6539ea7d95d92b61126f4f9cda3499432642800a1cf7729a',
+                function (err, decoded) {
+                    if (err) {
+                        return res.status(500).json({
+                            message: 'Token expired.',
+                            expiredAt: err.expiredAt
+                        });
+                    }
+                    return decoded
+                }
+            );
             currentUser = await findUserById(decoded.id);
+            if (!currentUser) {
+                currentUser = null
+                return
+            }
             currentUser.password = undefined // Remove password the user
         } else {
             currentUser = null

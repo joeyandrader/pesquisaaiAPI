@@ -3,6 +3,7 @@ const connectdb = require('../Database/DBConnection');
 
 //models
 const User = require('../Models/User.model');
+const Category = require('../Models/Category.model');
 
 const Company = connectdb.define('company', {
     fantasyname: {
@@ -68,6 +69,9 @@ const Company = connectdb.define('company', {
     instagram: {
         type: Sequelize.STRING
     },
+    image: {
+        type: Sequelize.STRING
+    },
     approvedStatus: {
         type: Sequelize.STRING,
         defaultValue: "pending"
@@ -95,6 +99,6 @@ User.hasMany(Company, {
     }
 })
 
-// Company.sync({ force: true });
+// Company.sync({ alter: true });
 
 module.exports = Company
