@@ -19,6 +19,13 @@ module.exports = class AdminController {
             return
         }
 
+        const verifyCategory = await Category.findOne({ where: { name: name } });
+
+        if (verifyCategory) {
+            res.status(201).json({ message: `Essa categoria ${name} ja existe!` });
+            return
+        }
+
         try {
             await Category.create({
                 name,

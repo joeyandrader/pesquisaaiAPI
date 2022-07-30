@@ -2,6 +2,8 @@ const port = process.env.PORT || 5000;
 const express = require('express')
 const app = express();
 const connectionDB = require('./src/Database/DBConnection');
+const cors = require('cors');
+
 
 
 //Import routers
@@ -11,6 +13,7 @@ const CompanyRouter = require('./src/Routes/CompanyRouter');
 const AdminRouter = require('./src/Routes/AdminRouter');
 
 
+
 //Database Connect
 try {
     connectionDB.authenticate()
@@ -18,6 +21,10 @@ try {
 } catch (error) {
     console.log(`Error connect to database. Error message: ${error}`)
 }
+
+
+//cors
+app.use(cors());
 
 
 //Middlewares

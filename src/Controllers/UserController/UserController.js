@@ -7,9 +7,15 @@ const createUserToken = require('../../Helpers/CreateUserToken');
 const getToken = require('../../Helpers/getToken');
 const getUserByToken = require('../../Helpers/getUserByToken');
 const verifyTokenIsValid = require('../../Helpers/VerifyTokenIsValid');
+
+
+//configs
+const configs = require('../../Configs/configs');
+
 //other modules
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+
 
 module.exports = class UserController {
     static async register(req, res) {
@@ -70,6 +76,9 @@ module.exports = class UserController {
         const salt = await bcrypt.genSalt(12);
         const hashPassword = await bcrypt.hash(password, salt);
 
+        //Create hash cpf
+        const hashCpf = await bcrypt.hash(cpf, salt);
+
 
         //Create new user in database
         try {
@@ -78,7 +87,7 @@ module.exports = class UserController {
                 lastname,
                 email,
                 password: hashPassword,
-                cpf,
+                cpf: hashCpf,
                 termscondition
             })
             await createUserToken(user, req, res);
@@ -128,7 +137,7 @@ module.exports = class UserController {
 
         if (req.headers.authorization) {
             const token = getToken(req)
-            const decoded = jwt.verify(token, 'abd4b9ba6539ea7d95d92b61126f4f9cda3499432642800a1cf7729a',
+            const decoded = jwt.verify(token, configs.secret,
                 function (err, decoded) {
                     if (err) {
                         return res.status(500).json({

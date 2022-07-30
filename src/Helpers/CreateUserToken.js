@@ -1,11 +1,12 @@
 const jwt = require('jsonwebtoken');
+const configs = require('../Configs/configs');
 
 const createUserToken = async (user, req, res) => {
     //Create a token
     const token = jwt.sign({
         name: user.firstname,
         id: user.id,
-    }, "abd4b9ba6539ea7d95d92b61126f4f9cda3499432642800a1cf7729a",
+    }, configs.secret,
         {
             expiresIn: "5h"
         },

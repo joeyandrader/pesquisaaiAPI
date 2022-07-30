@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const getToken = require('./getToken');
+const configs = require('../Configs/configs');
 
 //Middleware to validate token
 const checkToken = (req, res, next) => {
@@ -15,7 +16,7 @@ const checkToken = (req, res, next) => {
     }
 
     try {
-        const verified = jwt.verify(token, 'abd4b9ba6539ea7d95d92b61126f4f9cda3499432642800a1cf7729a')
+        const verified = jwt.verify(token, configs.secret)
         req.user = verified
         next()
     } catch (error) {

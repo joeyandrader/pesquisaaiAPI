@@ -1,12 +1,13 @@
 const getToken = require('./getToken');
 const jwt = require('jsonwebtoken');
 const { findUserById } = require('./FindDB');
+const configs = require('../Configs/configs');
 
 const verifyTokenIsValid = async (req, res) => {
 
     if (req.headers.authorization) {
         const token = getToken(req)
-        const decoded = jwt.verify(token, 'abd4b9ba6539ea7d95d92b61126f4f9cda3499432642800a1cf7729a',
+        const decoded = jwt.verify(token, configs.secret,
             function (err, decoded) {
                 if (err) {
                     res.status(500).json({

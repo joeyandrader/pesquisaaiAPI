@@ -8,17 +8,32 @@ const getToken = require('../../Helpers/getToken');
 const getUserByToken = require('../../Helpers/getUserByToken');
 const { findCompanyByCnpj, findAllCompanyByUserId, findCompanyById } = require('../../Helpers/FindDB');
 
+
 module.exports = class CompanyController {
 
     //Get the current company from user
     static async index(req, res) {
         const token = getToken(req);
         if (!token) {
-            res.status(200).json({ message: 'Token Invalido ou expirado!' })
+            res.status(500).json({ message: 'Token Invalido ou expirado!' })
             return
         }
         const user = await getUserByToken(token);
+        if (!user) {
+            res.status(500).json({ message: 'Usuario invalido!' })
+            return
+        }
+
         const getAllCompany = await findAllCompanyByUserId(user.id);
+        if (!getAllCompany) {
+            res.status(500).json({ message: 'Erro ao buscar a empresa!' })
+            return
+        }
+
+        if (getAllCompany.length == 0) {
+            res.status(200).json({ message: 'Você ainda não possui nenhuma empresa cadastrada!' })
+            return
+        }
         res.status(200).json({ Companys: getAllCompany });
     }
 
